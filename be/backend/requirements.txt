@@ -1,0 +1,9 @@
+flask>=3.0
+flask-cors>=4.0
+sqlalchemy>=2.0
+python-dotenv>=1.0
+langdetect>=1.0.9
+spacy>=3.7
+scikit-learn>=1.4
+sentence-transformers>=3.0
+gunicorn>=21.0
