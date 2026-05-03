@@ -1,0 +1,40 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - img [ref=e8]
+        - heading "CV Matcher" [level=1] [ref=e10]
+      - button "Match CV to Job" [disabled]:
+        - img
+        - text: Match CV to Job
+  - main [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - heading "Candidate CV" [level=3] [ref=e15]:
+          - img [ref=e16]
+          - text: Candidate CV
+        - generic [ref=e21]:
+          - img [ref=e22]
+          - paragraph [ref=e25]: Drag and drop your CV here
+          - paragraph [ref=e26]: Only PDF files are accepted
+          - generic [ref=e27] [cursor=pointer]: Browse PDF
+      - generic [ref=e28]:
+        - heading "Job Description" [level=3] [ref=e30]:
+          - img [ref=e31]
+          - text: Job Description
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - button "Replace Job" [ref=e50] [cursor=pointer]:
+              - img [ref=e38]
+              - text: Replace Job
+            - button "Add Sample iOS Job" [active] [ref=e39] [cursor=pointer]:
+              - img [ref=e40]
+              - text: Add Sample iOS Job
+            - button "Clear" [ref=e51] [cursor=pointer]:
+              - img [ref=e52]
+              - text: Clear
+          - generic [ref=e56]:
+            - generic [ref=e57]:
+              - img [ref=e58]
+              - heading "iOS Developer" [level=4] [ref=e62]
+            - paragraph [ref=e63]: We are looking for an experienced iOS Developer to join our mobile team. You will be responsible for designing, developing, and maintaining high-quality iOS applications using Swift and SwiftUI.
