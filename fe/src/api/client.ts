@@ -107,7 +107,7 @@ export interface MatchResponse {
 }
 
 export async function fetchJobs(): Promise<JobListItem[]> {
-  const res = await fetch(apiPath('/api/jobs'), {
+  const res = await fetch(apiPath('/api/jobs?limit=100'), {
     method: 'GET',
     headers: getHeaders(),
   });
