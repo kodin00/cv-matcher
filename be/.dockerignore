@@ -1,0 +1,10 @@
+.git
+__pycache__/
+*.pyc
+*.pyo
+.env
+app.db
+backend/app.db
+models/
+backend/checkpoints/
+data/*.csv

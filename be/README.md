@@ -14,7 +14,7 @@ Backend REST API for a bilingual CV semantic matching system. Receives a pre-ext
 | Auth | Static UUID token in `.env` | Simple Bearer token auth |
 | NLP Preprocessing | `langdetect`, `re`, `unicodedata` | Text cleaning, language detection |
 | Skill Extraction | `spaCy` + custom bilingual skill list | Rule-based NER for skills |
-| Embedding Model | `sentence-transformers` (`paraphrase-multilingual-mpnet-base-v2`) | Cross-lingual sentence embeddings |
+| Embedding Model | `sentence-transformers` (`paraphrase-multilingual-MiniLM-L12-v2`, fine-tuned) | Cross-lingual sentence embeddings |
 | Similarity | `scikit-learn` (`cosine_similarity`) | Compute semantic match scores |
 | Baseline | `scikit-learn` (`TfidfVectorizer`) | TF-IDF keyword matching — always returned alongside semantic score |
 | Data Store | `SQLite` (via `SQLAlchemy`) | Job descriptions — read-only from API |
@@ -30,6 +30,10 @@ backend/
 ├── app.py                      # Flask entry point
 ├── config.py                   # Env vars, token, model name
 ├── requirements.txt
+├── train.py                    # Fine-tuning script (CosineSimilarityLoss)
+├── evaluate.py                 # Batch evaluation — Precision/Recall/F1
+├── compare.py                  # Side-by-side base vs fine-tuned comparison
+├── integration_test.sh         # End-to-end API smoke test
 ├── seed/
 │   ├── schema.sql              # Idempotent CREATE TABLE statement
 │   └── jobs_seed.sql           # INSERT OR IGNORE seed data
@@ -53,6 +57,12 @@ backend/
 │
 └── utils/
     └── response_utils.py       # Standardised JSON response helpers
+
+data/
+└── prepare_real_data.py        # Convert annotated CSV → train/val pair CSVs
+
+models/
+└── finetuned-v2/               # Fine-tuned model checkpoint (not in git)
 ```
 
 ---
@@ -81,6 +91,8 @@ python -m spacy download xx_ent_wiki_sm
 > ```bash
 > pip install torch --index-url https://download.pytorch.org/whl/cpu
 > ```
+
+> `requirements.txt` includes `accelerate` and `datasets` which are required by the fine-tuning script (`train.py`). They are not needed to run the API server.
 
 ### 3. Configure environment
 
@@ -158,6 +170,50 @@ docker compose up -d
 
 # Remove services + DB volume (data reset)
 docker compose down -v
+```
+
+---
+
+## Fine-Tuning
+
+The embedding model is fine-tuned on a human-annotated dataset of 300 CV-JD pairs using `CosineSimilarityLoss` with continuous labels derived from 3-annotator aggregate scores.
+
+### 1. Prepare training data
+
+Obtain the annotated CSV (shared outside of git) and place it in `tmp/`. Then run from the project root:
+
+```bash
+python data/prepare_real_data.py
+```
+
+This produces `data/train_pairs.csv` (~240 rows) and `data/val_pairs.csv` (~60 rows) with a stratified 80/20 split.
+
+### 2. Fine-tune
+
+```bash
+cd backend
+python train.py \
+  --train ../data/train_pairs.csv \
+  --val   ../data/val_pairs.csv \
+  --output ../models/finetuned \
+  --epochs 4 \
+  --batch 16
+```
+
+### 3. Compare base vs fine-tuned
+
+```bash
+cd backend
+python compare.py --dataset ../data/val_pairs.csv
+```
+
+Outputs a Precision / Recall / F1 table for TF-IDF baseline, base semantic model, and fine-tuned model.
+
+### 4. Point the service at the fine-tuned model
+
+Set in `backend/.env`:
+```
+MODEL_NAME=models/finetuned
 ```
 
 ---

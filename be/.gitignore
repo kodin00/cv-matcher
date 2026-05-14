@@ -64,7 +64,6 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
-app.db
 
 # Scrapy stuff:
 .scrapy
@@ -212,6 +211,11 @@ docs/
 # Project-specific
 *.db
 .DS_Store
+tmp/
+models/
+models.zip
+backend/checkpoints/
+data/*.csv
 
 # AI related configs
 .qwen/
