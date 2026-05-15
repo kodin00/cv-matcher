@@ -127,6 +127,14 @@ SKILL_LIST = [
     "problem solving", "communication skills", "team leadership",
     "project management", "technical documentation",
 
+    # English - Marketing
+    "seo", "sem", "google ads", "meta ads", "google analytics",
+    "content marketing", "digital marketing", "performance marketing",
+    "funnel marketing", "a/b testing", "looker studio", "semrush",
+    "ahrefs", "similarweb", "brand strategy", "market research",
+    "campaign management", "social media strategy", "content creation",
+    "community management", "influencer marketing",
+
     # English - Security & Networking
     "cybersecurity", "penetration testing", "network security", "firewall",
     "encryption", "authentication", "authorization", "oauth", "jwt",

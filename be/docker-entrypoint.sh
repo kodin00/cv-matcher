@@ -15,15 +15,16 @@ mkdir -p "$DB_DIR"
 
 if [ ! -s "$DB_FILE" ]; then
     echo "[entrypoint] Initialising database at $DB_FILE"
-    sqlite3 "$DB_FILE" < /app/seed/schema.sql
-
-    if [ -f /app/seed/jobs_seed.sql ]; then
-        sqlite3 "$DB_FILE" < /app/seed/jobs_seed.sql
-    else
-        echo "[entrypoint] Warning: /app/seed/jobs_seed.sql not found, skipping seed data."
-    fi
-
-    echo "[entrypoint] Database ready."
 fi
+
+sqlite3 "$DB_FILE" < /app/seed/schema.sql
+
+if [ -f /app/seed/jobs_seed.sql ]; then
+    sqlite3 "$DB_FILE" < /app/seed/jobs_seed.sql
+else
+    echo "[entrypoint] Warning: /app/seed/jobs_seed.sql not found, skipping seed data."
+fi
+
+echo "[entrypoint] Database ready."
 
 exec "$@"

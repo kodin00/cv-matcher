@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, FileText, X, Loader2, Eye } from 'lucide-react';
+import { Upload, FileText, X, Loader2, Eye, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,11 +17,57 @@ import { useAppStore } from '@/store/useAppStore';
 import { generateUUID } from '@/utils/uuid';
 import { Candidate, ProcessingProgress } from '@/types';
 
+const EXAMPLE_CVS = [
+  {
+    id: 'mk-amelia',
+    name: 'Amelia Putri',
+    targetJob: 'MK00001 - Digital Marketing Specialist',
+    fileName: 'cv_mk00001_amelia_putri_digital_marketing.pdf',
+    path: '/example-cvs/cv_mk00001_amelia_putri_digital_marketing.pdf',
+  },
+  {
+    id: 'mk-rizky',
+    name: 'Rizky Nugroho',
+    targetJob: 'MK00001 - Digital Marketing Specialist',
+    fileName: 'cv_mk00001_rizky_nugroho_growth_marketer.pdf',
+    path: '/example-cvs/cv_mk00001_rizky_nugroho_growth_marketer.pdf',
+  },
+  {
+    id: 'mk-sari',
+    name: 'Sari Wulandari',
+    targetJob: 'MK00001 - Digital Marketing Specialist',
+    fileName: 'cv_mk00001_sari_wulandari_high_match.pdf',
+    path: '/example-cvs/cv_mk00001_sari_wulandari_high_match.pdf',
+  },
+  {
+    id: 'it-bima',
+    name: 'Bima Santoso',
+    targetJob: 'IT00001 - Backend Engineer',
+    fileName: 'cv_it00001_bima_santoso_backend_engineer.pdf',
+    path: '/example-cvs/cv_it00001_bima_santoso_backend_engineer.pdf',
+  },
+  {
+    id: 'it-nadia',
+    name: 'Nadia Lestari',
+    targetJob: 'IT00001 - Backend Engineer',
+    fileName: 'cv_it00001_nadia_lestari_backend_platform.pdf',
+    path: '/example-cvs/cv_it00001_nadia_lestari_backend_platform.pdf',
+  },
+  {
+    id: 'it-dimas',
+    name: 'Dimas Pratama',
+    targetJob: 'IT00001 - Backend Engineer',
+    fileName: 'cv_it00001_dimas_pratama_high_match.pdf',
+    path: '/example-cvs/cv_it00001_dimas_pratama_high_match.pdf',
+  },
+];
+
 export function FileUpload() {
   const [isDragging, setIsDragging] = useState(false);
   const [processingFiles, setProcessingFiles] = useState<Map<string, ProcessingProgress>>(new Map());
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loadingExampleId, setLoadingExampleId] = useState<string | null>(null);
   const { addCandidate, candidates, removeCandidate, updateCandidate } = useAppStore();
 
   // Only allow 1 CV at a time
@@ -37,7 +83,7 @@ export function FileUpload() {
     setIsDragging(false);
   };
 
-  const processSingleFile = async (file: File) => {
+  const processSingleFile = async (file: File, displayName?: string) => {
     // Clear any existing candidate first
     if (existingCandidate) {
       removeCandidate(existingCandidate.id);
@@ -46,7 +92,7 @@ export function FileUpload() {
     const id = generateUUID();
     const candidate: Candidate = {
       id,
-      name: file.name.replace(/\.[^/.]+$/, ''),
+      name: displayName ?? file.name.replace(/\.[^/.]+$/, ''),
       fileName: file.name,
       extractedText: '',
       status: 'processing',
@@ -100,6 +146,34 @@ export function FileUpload() {
       processSingleFile(pdfFile);
     }
     e.target.value = '';
+  };
+
+  const handleExampleSelect = async (example: typeof EXAMPLE_CVS[number]) => {
+    try {
+      setLoadingExampleId(example.id);
+      const response = await fetch(example.path);
+
+      if (!response.ok) {
+        throw new Error(`Failed to load ${example.fileName}`);
+      }
+
+      const blob = await response.blob();
+      const file = new File([blob], example.fileName, { type: 'application/pdf' });
+      await processSingleFile(file, example.name);
+    } catch (error) {
+      const id = generateUUID();
+      addCandidate({
+        id,
+        name: example.name,
+        fileName: example.fileName,
+        extractedText: '',
+        status: 'error',
+        errorMessage: error instanceof Error ? error.message : 'Failed to load example CV',
+        createdAt: new Date(),
+      });
+    } finally {
+      setLoadingExampleId(null);
+    }
   };
 
   const handleRemove = (id: string) => {
@@ -156,6 +230,41 @@ export function FileUpload() {
             Browse PDF
           </label>
         </Button>
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-muted-foreground">Example CVs</h3>
+        <div className="grid grid-cols-1 gap-2">
+          {EXAMPLE_CVS.map((example) => {
+            const isLoading = loadingExampleId === example.id;
+
+            return (
+              <Button
+                key={example.id}
+                type="button"
+                variant="outline"
+                className="h-auto justify-start px-3 py-3 text-left"
+                onClick={() => handleExampleSelect(example)}
+                disabled={loadingExampleId !== null}
+              >
+                <div className="flex w-full items-start gap-3">
+                  {isLoading ? (
+                    <Loader2 className="mt-0.5 h-4 w-4 flex-shrink-0 animate-spin text-primary" />
+                  ) : (
+                    <FileText className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{example.name}</p>
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Briefcase className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">{example.targetJob}</span>
+                    </p>
+                  </div>
+                </div>
+              </Button>
+            );
+          })}
+        </div>
       </div>
 
       {existingCandidate && (

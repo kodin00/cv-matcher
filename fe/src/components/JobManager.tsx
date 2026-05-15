@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Building2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Building2, Loader2, AlertCircle, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/store/useAppStore';
 import { fetchJobs, fetchJob, type JobListItem, type JobDetail } from '@/api/client';
 import { Job } from '@/types';
 
+const JOBS_PER_PAGE = 10;
+
 export function JobManager() {
   const { selectedJob, setSelectedJob } = useAppStore();
   const [jobs, setJobs] = useState<JobListItem[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalJobs, setTotalJobs] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectingJobId, setSelectingJobId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -16,9 +21,10 @@ export function JobManager() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchJobs()
+    fetchJobs(page, JOBS_PER_PAGE)
       .then((data) => {
-        setJobs(data);
+        setJobs(data.jobs);
+        setTotalJobs(data.total);
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load jobs');
@@ -26,7 +32,11 @@ export function JobManager() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [page]);
+
+  const totalPages = Math.max(1, Math.ceil(totalJobs / JOBS_PER_PAGE));
+  const firstJobNumber = totalJobs === 0 ? 0 : (page - 1) * JOBS_PER_PAGE + 1;
+  const lastJobNumber = Math.min(page * JOBS_PER_PAGE, totalJobs);
 
   const handleSelectJob = async (jobItem: JobListItem) => {
     if (selectedJob?.id === jobItem.job_id) return;
@@ -77,9 +87,46 @@ export function JobManager() {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-        Select a job from the list below
-      </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Select a job from the list below
+          </p>
+          {totalJobs > JOBS_PER_PAGE && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Showing {firstJobNumber}-{lastJobNumber} of {totalJobs}
+            </p>
+          )}
+        </div>
+
+        {totalJobs > JOBS_PER_PAGE && (
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+              disabled={page === 1 || loading}
+            >
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Prev
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
+              disabled={page === totalPages || loading}
+            >
+              Next
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 gap-2">
         {jobs.map((job) => {
@@ -109,8 +156,8 @@ export function JobManager() {
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {job.company}
-                      {job.industry && ` · ${job.industry}`}
-                      {job.required_experience_years !== null && ` · ${job.required_experience_years}+ years`}
+                      {job.industry && ` / ${job.industry}`}
+                      {job.required_experience_years !== null && ` / ${job.required_experience_years}+ years`}
                     </p>
                   </div>
 
@@ -161,6 +208,7 @@ export function JobManager() {
           <p className="text-xs">Jobs will appear here once added to the backend.</p>
         </div>
       )}
+
     </div>
   );
 }

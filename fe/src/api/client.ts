@@ -106,13 +106,16 @@ export interface MatchResponse {
   processing_time_ms: number;
 }
 
-export async function fetchJobs(): Promise<JobListItem[]> {
-  const res = await fetch(apiPath('/api/jobs?limit=100'), {
+export async function fetchJobs(page = 1, limit = 10): Promise<JobsResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  const res = await fetch(apiPath(`/api/jobs?${params.toString()}`), {
     method: 'GET',
     headers: getHeaders(),
   });
-  const data = await handleResponse<JobsResponse>(res);
-  return data.jobs;
+  return handleResponse<JobsResponse>(res);
 }
 
 export async function fetchJob(jobId: string): Promise<JobDetail> {

@@ -52,9 +52,9 @@ check "limit=1 returns one job" '"limit":1' "$r"
 
 echo ""
 echo "=== Job detail ==="
-r=$(curl -s -H "Authorization: Bearer $TOKEN" "$BASE/jobs/jd-0001")
+r=$(curl -s -H "Authorization: Bearer $TOKEN" "$BASE/jobs/IT00001")
 echo "$r"
-check "jd-0001 title present"   '"title":'          "$r"
+check "IT00001 title present"   '"title":'          "$r"
 check "required_skills is array" '"required_skills":\[' "$r"
 
 r=$(curl -s -H "Authorization: Bearer $TOKEN" "$BASE/jobs/jd-9999")
@@ -75,7 +75,7 @@ check "bad job_id → JOB_NOT_FOUND" "JOB_NOT_FOUND" "$r"
 
 r=$(curl -s -X POST -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
-    -d '{"job_id":"jd-0001","candidate_id":"c1","candidate_name":"Alice","cv_text":"   "}' \
+    -d '{"job_id":"IT00001","candidate_id":"c1","candidate_name":"Alice","cv_text":"   "}' \
     "$BASE/match")
 check "whitespace cv_text → INVALID_INPUT" "INVALID_INPUT" "$r"
 
@@ -84,7 +84,7 @@ echo "=== Match endpoint — full pipeline ==="
 CV="Saya adalah software engineer dengan 3 tahun pengalaman. Bachelor of Computer Science. Menguasai Python, SQL, REST API, Git, dan Docker. Pengalaman membangun backend services dan integrasi database."
 r=$(curl -s -X POST -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
-    -d "{\"job_id\":\"jd-0001\",\"candidate_id\":\"c-test-01\",\"candidate_name\":\"Test Candidate\",\"cv_text\":\"$CV\"}" \
+    -d "{\"job_id\":\"IT00001\",\"candidate_id\":\"c-test-01\",\"candidate_name\":\"Test Candidate\",\"cv_text\":\"$CV\"}" \
     "$BASE/match")
 echo "$r"
 check "status=success"           '"status":"success"'       "$r"
@@ -103,7 +103,7 @@ check "years_detected"           '"years_detected":'        "$r"
 echo ""
 echo "=== Match endpoint — no token ==="
 r=$(curl -s -X POST -H "Content-Type: application/json" \
-    -d '{"job_id":"jd-0001","candidate_id":"c1","candidate_name":"A","cv_text":"test"}' \
+    -d '{"job_id":"IT00001","candidate_id":"c1","candidate_name":"A","cv_text":"test"}' \
     "$BASE/match")
 check "no token → UNAUTHORIZED" "UNAUTHORIZED" "$r"
 

@@ -4,6 +4,9 @@
 -- 10 x Finance (FN00001–FN00010)
 -- Run: sqlite3 app.db < seed/jobs_seed.sql  (idempotent — INSERT OR IGNORE)
 
+-- Remove the old two-job default dataset before applying the 30-job default set.
+DELETE FROM jobs WHERE id IN ('jd-0001', 'jd-0002');
+
 -- ============================================================
 -- MARKETING
 -- ============================================================

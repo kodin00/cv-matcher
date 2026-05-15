@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from sqlalchemy import case
 from middleware.auth import require_token
 from utils.response_utils import success, error
 from models.db_models import get_db, Job
@@ -20,7 +21,13 @@ def list_jobs():
         query = query.filter(Job.industry == industry)
 
     total = query.count()
-    jobs = query.offset((page - 1) * limit).limit(limit).all()
+    default_order = case(
+        (Job.id.like("MK%"), 0),
+        (Job.id.like("IT%"), 1),
+        (Job.id.like("FN%"), 2),
+        else_=3,
+    )
+    jobs = query.order_by(default_order, Job.id).offset((page - 1) * limit).limit(limit).all()
 
     return success({
         "total": total,
