@@ -7,7 +7,7 @@ load_dotenv()
 
 BACKEND_DIR = Path(__file__).resolve().parent
 BACKEND_ROOT = BACKEND_DIR.parent
-DEFAULT_BASE_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
+DEFAULT_BASE_MODEL = "paraphrase-multilingual-mpnet-base-v2"
 DEFAULT_LOCAL_MODEL = "models/finetuned"
 
 

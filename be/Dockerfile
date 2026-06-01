@@ -9,7 +9,7 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     && python -m spacy download xx_ent_wiki_sm \
-    && python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')"
+    && python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')"
 
 COPY backend/ .
 COPY models.zip /tmp/models.zip

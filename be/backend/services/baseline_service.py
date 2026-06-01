@@ -1,4 +1,4 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 _INDONESIAN_STOPWORDS = {
@@ -10,13 +10,17 @@ _INDONESIAN_STOPWORDS = {
     "memiliki", "melakukan", "terhadap", "sangat", "namun", "ketika",
 }
 
+# The system is bilingual (Indonesian/English), so the keyword baseline strips
+# stopwords from both languages. The English list is scikit-learn's curated set.
+_STOPWORDS = _INDONESIAN_STOPWORDS | set(ENGLISH_STOP_WORDS)
+
 
 def compute_keyword_score(cv_text: str, jd_text: str) -> float:
     if not cv_text.strip() or not jd_text.strip():
         return 0.0
 
     vectorizer = TfidfVectorizer(
-        stop_words=list(_INDONESIAN_STOPWORDS),
+        stop_words=list(_STOPWORDS),
         sublinear_tf=True,
         token_pattern=r"(?u)\b\w+\b",
     )

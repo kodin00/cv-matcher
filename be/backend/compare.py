@@ -11,7 +11,7 @@ The dataset file must have columns: cv_text, jd_text, label
   label: continuous float in [0.0, 1.0]; values >= 0.5 are treated as Relevant.
 
 Environment variables (read from backend/.env or passed inline):
-  MODEL_NAME   — base model name or path  (default: paraphrase-multilingual-MiniLM-L12-v2)
+  MODEL_NAME   — base model name or path  (default: paraphrase-multilingual-mpnet-base-v2)
   FINETUNED    — fine-tuned model path     (default: ../models/finetuned)
 
 Example:
@@ -113,7 +113,7 @@ def main() -> None:
     parser.add_argument("--dataset",   default="../data/val_pairs.csv",
                         help="Labeled CSV with cv_text, jd_text, label columns")
     parser.add_argument("--base",      default=os.getenv("MODEL_NAME",
-                        "paraphrase-multilingual-MiniLM-L12-v2"),
+                        "paraphrase-multilingual-mpnet-base-v2"),
                         help="Base model name or HF Hub ID")
     parser.add_argument("--finetuned", default=os.getenv("FINETUNED",
                         "../models/finetuned"),

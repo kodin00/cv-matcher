@@ -14,7 +14,7 @@ Backend REST API for a bilingual CV semantic matching system. Receives a pre-ext
 | Auth | Static UUID token in `.env` | Simple Bearer token auth |
 | NLP Preprocessing | `langdetect`, `re`, `unicodedata` | Text cleaning, language detection |
 | Skill Extraction | `spaCy` + custom bilingual skill list | Rule-based NER for skills |
-| Embedding Model | `sentence-transformers` (`paraphrase-multilingual-MiniLM-L12-v2`, fine-tuned) | Cross-lingual sentence embeddings |
+| Embedding Model | `sentence-transformers` (`paraphrase-multilingual-mpnet-base-v2`, fine-tuned) | Cross-lingual sentence embeddings |
 | Similarity | `scikit-learn` (`cosine_similarity`) | Compute semantic match scores |
 | Baseline | `scikit-learn` (`TfidfVectorizer`) | TF-IDF keyword matching — always returned alongside semantic score |
 | Data Store | `SQLite` (via `SQLAlchemy`) | Job descriptions — read-only from API |
