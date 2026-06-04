@@ -32,7 +32,11 @@ def match():
         return error("INVALID_INPUT", "cv_text must not be empty.", 400)
 
     db = get_db()
-    job = db.query(Job).filter(Job.id == job_id.strip()).first()
+    try:
+        job = db.query(Job).filter(Job.id == job_id.strip()).first()
+    finally:
+        db.close()
+
     if not job:
         return error("JOB_NOT_FOUND", f"No job found with id '{job_id}'.", 404)
 
